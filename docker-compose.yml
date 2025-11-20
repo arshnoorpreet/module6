@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6
+    container_name: module5p3-mongo
+    volumes:
+      - mongo_data:/data/db
+ 
+  backend:
+    build: ./backend
+    container_name: module5p3-backend
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/bank_app
+    depends_on:
+      - mongo
+ 
+  transactions:
+    build: ./transactions
+    container_name: module5p3-transactions
+    depends_on:
+      - backend
+ 
+  nginx:
+    image: nginx:alpine
+    container_name: module5p3-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./studentportfolio:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - transactions
+ 
+volumes:
+  mongo_data:
